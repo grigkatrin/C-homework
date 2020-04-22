@@ -1,13 +1,16 @@
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include <algorithm>
 
 double function(double x) {
-    return -x * x - 0.5;
+    return sqrt(x);
 }
 
 int main() {
-    freopen("g3.out", "w", stdout);
+//    freopen("g3.out", "w", stdout);
+    std::ofstream out;
+    out.open("/Users/grig.katrin/CLionProjects/C-homework/Lab1/Grafs/g2.out");
 
     int m, n;
     double x0, x1;
@@ -15,8 +18,8 @@ int main() {
 
     m = 100;
     n = 40;
-    x0 = -1;
-    x1 = 1;
+    x0 = 1;
+    x1 = 20;
 
     double min_f = function(x0);
     double max_f = function(x0);
@@ -80,11 +83,14 @@ int main() {
         }
     }
 
-    for (int i = 0; i <= n; i++) {
-        for (int j = 0; j < m; j++) {
-            std::cout << grid[i][j];
+    if (out.is_open())
+    {
+        for (int i = 0; i <= n; i++) {
+            for (int j = 0; j < m; j++) {
+                out << grid[i][j];
+            }
+            out << std::endl;
         }
-        std::cout << std::endl;
     }
 
     return 0;
