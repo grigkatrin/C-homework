@@ -29,7 +29,7 @@ public:
     int_list_t &operator=(const int_list_t &other); // O(size + other.size())
 
     int &operator[](size_t pos); // O(min($pos, size - $pos))
-    const int &operator(size_t pos) const; // O(min($pos, size - $pos))
+    const int &operator[](size_t pos) const; // O(min($pos, size - $pos))
 
     int &back();    // last element O(1)
     const int back() const; // O(1)
