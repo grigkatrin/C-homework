@@ -1,3 +1,4 @@
+#include <mach/mach_types.h>
 #include "int_list_t.h"
 
 int_list_t::int_list_t() {
@@ -9,7 +10,7 @@ int_list_t::int_list_t() {
 
 int_list_t::node_t *int_list_t::get(int pos) const {
     if (pos <= list_size / 2) {
-        node_t *current = int_list_t().first->next;
+        node_t *current = first->next;
         while (pos > 0) {
             current = current->next;
             pos--;
@@ -17,7 +18,7 @@ int_list_t::node_t *int_list_t::get(int pos) const {
 
         return current;
     } else {
-        node_t *current = int_list_t().last->prev;
+        node_t *current = last;
         while (pos < list_size) {
             current = current->prev;
             pos++;
@@ -27,18 +28,16 @@ int_list_t::node_t *int_list_t::get(int pos) const {
     }
 }
 
-int_list_t::int_list_t(const int_list_t &other) {
+int_list_t::int_list_t(const int_list_t &other) : int_list_t() {
     list_size = other.list_size;
     auto current = other.first->next;
-    int current_pos = 1;
     while (current != other.last) {
-        insert(current_pos, current->value);
+        push_back(current->value);
         current = current->next;
-        current_pos++;
     }
 }
 
-int_list_t::int_list_t(size_t count, int value) {
+int_list_t::int_list_t(size_t count, int value) : int_list_t() {
     list_size = count;
     for (int i = 1; i < count; ++i) {
         push_back(value);
@@ -46,19 +45,14 @@ int_list_t::int_list_t(size_t count, int value) {
 }
 
 int_list_t::~int_list_t() {
-    node_t *current = first->next;
-    while (current != last) {
-        delete current->prev;
-        current = current->next;
-    }
+    clear();
+    delete first;
     delete last;
 }
 
 int_list_t &int_list_t::operator=(const int_list_t &other) {
-    if (this != &other) {
-        int_list_t current(other);
-        swap(current);
-    }
+    int_list_t current(other);
+    swap(current);
     return *this;
 }
 
@@ -104,8 +98,6 @@ void int_list_t::clear() {
         current = next_node;
         next_node = current->next;
     }
-    delete (first);
-    delete (last);
     list_size = 0;
 }
 
@@ -118,19 +110,11 @@ void int_list_t::insert(size_t pos, int new_val) {
 }
 
 void int_list_t::push_front(int new_val) {
-    node_t *current = new node_t(new_val, nullptr, nullptr);
-    current->next = first->next;
-    first->next = current;
-    current->prev = first;
-    list_size++;
+    insert(0, new_val)
 }
 
 void int_list_t::push_back(int new_val) {
-    node_t *current = new node_t(new_val, nullptr, nullptr);
-    current->prev = last->prev;
-    current->next = last;
-    last->prev = current;
-    list_size++;
+    insert(list_size - 1, new_val)
 }
 
 void int_list_t::erase(size_t pos) {
@@ -142,19 +126,11 @@ void int_list_t::erase(size_t pos) {
 }
 
 void int_list_t::pop_front() {
-    node_t *current = first->next;
-    first->next = current->next;
-    current->next->prev = first;
-    delete current;
-    list_size--;
+    erase(0);
 }
 
 void int_list_t::pop_back() {
-    node_t *current = last->prev;
-    current->prev->next = last;
-    last->prev = current->prev;
-    delete current;
-    list_size--;
+    erase(list_size - 1);
 }
 
 int_list_t int_list_t::splice(size_t start_pos, size_t count) {
@@ -184,8 +160,8 @@ int_list_t &int_list_t::merge(int_list_t &other) {
     other.last->prev->next = last;
     last->prev = other.last->prev;
 
-    other.first->next = last;
-    other.last->prev = first;
+    other.first->next = other.last;
+    other.last->prev = other.first;
     list_size += other.list_size;
     other.list_size = 0;
 
@@ -193,16 +169,18 @@ int_list_t &int_list_t::merge(int_list_t &other) {
 }
 
 void int_list_t::reverse() {
-    node_t *current = first->next;
-    node_t *next_node = current->next;
-    while (next_node != last) {
-        std::swap(current->next, current->prev);
-        current = next_node;
-        next_node = current->next;
+    if (not this->empty()) {
+        node_t *current = first->next;
+        node_t *next_node = current->next;
+        while (next_node != last) {
+            std::swap(current->next, current->prev);
+            current = next_node;
+            next_node = current->next;
+        }
+        first->next->prev = first;
+        last->prev->next = last;
+        std::swap(first->next, last->prev);
     }
-    first->next->prev = first;
-    last->prev->next = last;
-    std::swap(first->next, last->prev);
 }
 
 void int_list_t::swap(int_list_t &other) {
