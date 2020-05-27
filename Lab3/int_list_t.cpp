@@ -38,7 +38,6 @@ int_list_t::int_list_t(const int_list_t &other) : int_list_t() {
 }
 
 int_list_t::int_list_t(size_t count, int value) : int_list_t() {
-    list_size = count;
     for (int i = 1; i < count; ++i) {
         push_back(value);
     }
@@ -114,7 +113,7 @@ void int_list_t::push_front(int new_val) {
 }
 
 void int_list_t::push_back(int new_val) {
-    insert(list_size - 1, new_val)
+    insert(list_size, new_val)
 }
 
 void int_list_t::erase(size_t pos) {
@@ -137,6 +136,7 @@ int_list_t int_list_t::splice(size_t start_pos, size_t count) {
     int_list_t result_list;
     node_t *current = get(start_pos);
     result_list.first->next = current;
+    current->prev = result_list.first;
     node_t *end_1 = current->prev;
 
     for (int i = 0; i < count - 1; i++) {
@@ -144,6 +144,7 @@ int_list_t int_list_t::splice(size_t start_pos, size_t count) {
     }
 
     result_list.last->prev = current;
+    current->next = result_list.last;
     node_t *end_2 = current->next;
 
     end_1->next = end_2;
@@ -155,21 +156,23 @@ int_list_t int_list_t::splice(size_t start_pos, size_t count) {
 }
 
 int_list_t &int_list_t::merge(int_list_t &other) {
-    last->prev->next = other.first->next;
-    other.first->next->prev = last->prev;
-    other.last->prev->next = last;
-    last->prev = other.last->prev;
+    if (!other.empty()) {
+        last->prev->next = other.first->next;
+        other.first->next->prev = last->prev;
+        other.last->prev->next = last;
+        last->prev = other.last->prev;
 
-    other.first->next = other.last;
-    other.last->prev = other.first;
-    list_size += other.list_size;
-    other.list_size = 0;
+        other.first->next = other.last;
+        other.last->prev = other.first;
+        list_size += other.list_size;
+        other.list_size = 0;
+    }
 
     return *this;
 }
 
 void int_list_t::reverse() {
-    if (not this->empty()) {
+    if (!empty()) {
         node_t *current = first->next;
         node_t *next_node = current->next;
         while (next_node != last) {
