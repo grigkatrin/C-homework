@@ -8,23 +8,24 @@
 
 class game_t {
 public:
-  using player_t = std::shared_ptr<strategy_interface_t>;
-  game_t(const player_t &first, const player_t &second);
+    using player_t = std::shared_ptr<strategy_interface_t>;
 
-  void play();
+    game_t(const player_t &first, const player_t &second);
+
+    void play();
 
 private:
-  enum game_outcome_t {
-    WIN,
-    TIE,
-    IN_PROGRESS
-  };
+    enum game_outcome_t {
+        WIN,
+        TIE,
+        IN_PROGRESS
+    };
 
-  bool is_win_line(int x, int y, int dx, int dy) const;
-  game_outcome_t is_win() const;
-  bool apply_step(const step_t &step, size_t player_num);
+    game_outcome_t is_win() const;
+    apply_step_t apply_step(const step_t &step, size_t player_num, std::set<std::pair<size_t, size_t> > &attack_checkers);
 
-  field_t field;
-  std::vector<player_t> players;
+    field_t field;
+    std::vector<player_t> players;
+    size_t steps_amount = 0;
 };
 

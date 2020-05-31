@@ -3,7 +3,8 @@ set(SOURCES
 		human.cpp
 		computer1.cpp
 		computer2.cpp
-		computer_interface.cpp)
+		computer_interface.cpp
+		interface.cpp)
 set(HEADERS
 		human.h
 		computer.h
