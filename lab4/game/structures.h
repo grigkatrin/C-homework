@@ -47,9 +47,9 @@ struct field_t {
                 }
             }
         }
+        fld[6][3]='B';
+        fld[4][1]='w';
         fld[2][1]='w';
-        fld[4][1]='b';
-        fld[4][3]='b';
     }
 
     char fld[8][8];

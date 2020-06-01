@@ -61,16 +61,15 @@ step_t human_strategy_t::next_step(const field_t &fld, std::pair<size_t, size_t>
 bool human_strategy_t::possible_attack(const field_t &fld, size_t player_num,
                                        std::set<std::pair<size_t, size_t>> &attack_checker) {
     attack_checker.clear();
-    std::cout << "Start size " << attack_checker.size() << std::endl;
     bool changed = false;
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
             if (player_num == 0) {
-                if (fld.fld[i][j] == 'w') {
+                if (fld.fld[i][j] == 'w' || fld.fld[i][j] == 'W') {
                     changed = attacked_checkers(fld, attack_checker, std::pair<size_t, size_t>(j, i));
                 }
             } else {
-                if (fld.fld[i][j] == 'b') {
+                if (fld.fld[i][j] == 'b' || fld.fld[i][j] == 'B') {
                     changed = attacked_checkers(fld, attack_checker, std::pair<size_t, size_t>(j, i));
                 }
             }
