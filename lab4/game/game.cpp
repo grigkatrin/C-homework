@@ -5,14 +5,16 @@
 game_t::game_t(const player_t &first, const player_t &second) :
         field() {
     players.push_back(first);
+    players[0]->player_num = 0;
     players.push_back(second);
+    players[1]->player_num = 1;
 }
 
 apply_step_t
-game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<size_t, size_t> > &attack_checkers) {
+game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<int, int> > &attack_checkers) {
     char &from_cell = field.fld[step.y_from - 1][step.x_from - 1];
     char &to_cell = field.fld[step.y_to - 1][step.x_to - 1];
-    bool is_attack = players[player_num]->possible_attack(field, player_num, attack_checkers);
+    bool is_attack = players[player_num]->possible_attack(field, attack_checkers);
     size_t next_player = (player_num + 1) % 2;
 
     if ((to_cell != '*') || (from_cell == '.') || (from_cell == '*')) {
@@ -32,10 +34,10 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<siz
         }
         if (from_cell == 'W' && abs(step.y_to - step.y_from) == abs(step.x_to - step.x_from) && !is_attack) {
             bool empty_road = true;
-            size_t min_y = std::min(step.y_to, step.y_from);
-            size_t min_x = std::min(step.x_to, step.x_from);
-            for (int i = 0; i < abs(step.y_to - step.y_from) - 1; ++i) {
-                if (field.fld[min_y + i][min_x + i] != '*') {
+            int k_y = (step.y_to - step.y_from) / abs(step.y_to - step.y_from);
+            int k_x = (step.x_to - step.x_from) / abs(step.x_to - step.x_from);
+            for (int i = 1; i < abs(step.y_to - step.y_from); ++i) {
+                if (field.fld[step.y_from + i * k_y - 1][step.x_from + i * k_x - 1] != '*') {
                     empty_road = false;
                 }
             }
@@ -56,11 +58,15 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<siz
                         size_t min_y = std::min(next_step.y_to, next_step.y_from);
                         size_t min_x = std::min(next_step.x_to, next_step.x_from);
                         char &middle_cell = field.fld[min_y][min_x];
-                        if (middle_cell == 'b') {
+                        if (middle_cell == 'b' || middle_cell == 'B') {
+                            --players[next_player]->checker_amount;
                             middle_cell = '*';
                             std::swap(field.fld[next_step.y_from - 1][next_step.x_from - 1],
                                       field.fld[next_step.y_to - 1][next_step.x_to - 1]);
-                            --players[next_player]->checker_amount;
+                            if (next_step.y_to == 8) {
+                                field.fld[next_step.y_to - 1][next_step.x_to - 1] = 'W';
+                                return {true, next_player};
+                            }
                             is_correct_step = true;
                         }
                     } else if (abs(next_step.y_from - next_step.y_to) == abs(next_step.x_from - next_step.x_to) &&
@@ -68,10 +74,11 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<siz
                                field.fld[next_step.y_to - 1][next_step.x_to - 1] == '*') {
                         bool enemy = false;
                         std::pair<size_t, size_t> enemy_pos;
-                        int k_y = (next_step.y_to - next_step.y_from) / abs(next_step.y_to - next_step.y_from) ;
+                        int k_y = (next_step.y_to - next_step.y_from) / abs(next_step.y_to - next_step.y_from);
                         int k_x = (next_step.x_to - next_step.x_from) / abs(next_step.x_to - next_step.x_from);
                         for (int i = 1; i < abs(step.y_to - step.y_from); ++i) {
-                            if (enemy && field.fld[next_step.y_from + i * k_y - 1][next_step.x_from + i * k_x - 1] != '*') {
+                            if (enemy &&
+                                field.fld[next_step.y_from + i * k_y - 1][next_step.x_from + i * k_x - 1] != '*') {
                                 enemy = false;
                                 break;
                             }
@@ -83,10 +90,14 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<siz
                             }
                         }
                         if (enemy) {
+                            --players[next_player]->checker_amount;
                             std::swap(field.fld[next_step.y_from - 1][next_step.x_from - 1],
                                       field.fld[next_step.y_to - 1][next_step.x_to - 1]);
                             field.fld[enemy_pos.second][enemy_pos.first] = '*';
-                            --players[next_player]->checker_amount;
+                            if (next_step.y_to == 8) {
+                                field.fld[next_step.y_to - 1][next_step.x_to - 1] = 'W';
+                                return {true, next_player};
+                            }
                             is_correct_step = true;
                         }
                     }
@@ -122,13 +133,14 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<siz
         }
         if (from_cell == 'B' && abs(step.y_to - step.y_from) == abs(step.x_to - step.x_from) && !is_attack) {
             bool empty_road = true;
-            size_t min_y = std::min(step.y_to, step.y_from);
-            size_t min_x = std::min(step.x_to, step.x_from);
-            for (int i = 0; i < abs(step.y_to - step.y_from) - 1; ++i) {
-                if (field.fld[min_y + i][min_x + i] != '*') {
+            int k_y = (step.y_to - step.y_from) / abs(step.y_to - step.y_from);
+            int k_x = (step.x_to - step.x_from) / abs(step.x_to - step.x_from);
+            for (int i = 1; i < abs(step.y_to - step.y_from); ++i) {
+                if (field.fld[step.y_from + i * k_y - 1][step.x_from + i * k_x - 1] != '*') {
                     empty_road = false;
                 }
             }
+
             if (empty_road) {
                 std::swap(to_cell, from_cell);
                 return {true, next_player};
@@ -137,7 +149,6 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<siz
         if (is_attack && attack_checkers.count(std::pair<size_t, size_t>(step.x_from - 1, step.y_from - 1))) {
             bool next_attack;
             step_t next_step = step;
-            std::cout << next_step.x_to << ' ' << next_step.y_to << std::endl;
 
             do {
                 bool is_correct_step = false;
@@ -147,11 +158,15 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<siz
                         size_t min_y = std::min(next_step.y_to, next_step.y_from);
                         size_t min_x = std::min(next_step.x_to, next_step.x_from);
                         char &middle_cell = field.fld[min_y][min_x];
-                        if (middle_cell == 'w') {
+                        if (middle_cell == 'w' || middle_cell == 'W') {
+                            --players[next_player]->checker_amount;
                             middle_cell = '*';
                             std::swap(field.fld[next_step.y_from - 1][next_step.x_from - 1],
                                       field.fld[next_step.y_to - 1][next_step.x_to - 1]);
-                            --players[next_player]->checker_amount;
+                            if (next_step.y_to == 1) {
+                                field.fld[next_step.y_to - 1][next_step.x_to - 1] = 'B';
+                                return {true, next_player};
+                            }
                             is_correct_step = true;
                         }
                     } else if (abs(next_step.y_from - next_step.y_to) == abs(next_step.x_from - next_step.x_to) &&
@@ -159,10 +174,11 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<siz
                                field.fld[next_step.y_to - 1][next_step.x_to - 1] == '*') {
                         bool enemy = false;
                         std::pair<size_t, size_t> enemy_pos;
-                        int k_y = (next_step.y_to - next_step.y_from) / abs(next_step.y_to - next_step.y_from) ;
+                        int k_y = (next_step.y_to - next_step.y_from) / abs(next_step.y_to - next_step.y_from);
                         int k_x = (next_step.x_to - next_step.x_from) / abs(next_step.x_to - next_step.x_from);
                         for (int i = 1; i < abs(step.y_to - step.y_from); ++i) {
-                            if (enemy && field.fld[next_step.y_from + i * k_y - 1][next_step.x_from + i * k_x - 1] != '*') {
+                            if (enemy &&
+                                field.fld[next_step.y_from + i * k_y - 1][next_step.x_from + i * k_x - 1] != '*') {
                                 enemy = false;
                                 break;
                             }
@@ -174,10 +190,14 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<siz
                             }
                         }
                         if (enemy) {
+                            --players[next_player]->checker_amount;
                             std::swap(field.fld[next_step.y_from - 1][next_step.x_from - 1],
                                       field.fld[next_step.y_to - 1][next_step.x_to - 1]);
+                            if (next_step.y_to == 1) {
+                                field.fld[next_step.y_to - 1][next_step.x_to - 1] = 'B';
+                                return {true, next_player};
+                            }
                             field.fld[enemy_pos.second][enemy_pos.first] = '*';
-                            --players[next_player]->checker_amount;
                             is_correct_step = true;
                         }
 
@@ -205,24 +225,83 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<siz
     return {false, player_num};
 }
 
-game_t::game_outcome_t game_t::is_win() const {
+game_t::game_outcome_t game_t::is_win(size_t player_num) const {
+    std::set<std::pair<int, int>> attack_checkers;
+
+    player_num = (player_num + 1) % 2;
+    bool can_move = false;
+    for (int row = 0; row < 8; row++) {
+        for (int col = 0; col < 8; col++) {
+            if (player_num == 0) {
+                if (field.fld[row][col] == 'w' &&
+                    (field.fld[row + 1][col + 1] == '*' || field.fld[row + 1][col - 1] == '*')) {
+                    can_move = true;
+                }
+                if (field.fld[row][col] == 'W' || field.fld[row][col] == 'w') {
+                    int change_step[2] = {-1, 1};
+                    for (auto &i: change_step) {
+                        for (auto &j: change_step) {
+                            if (field.fld[row + i][col + j] == '*' && field.fld[row][col] == 'W') {
+                                can_move = true;
+                                break;
+                            }
+                            if ((field.fld[row + i][col + j] == 'b' || field.fld[row + i][col + j] == 'B') &&
+                                field.fld[row + i * 2][col + j * 2] == '*') {
+                                can_move = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (field.fld[row][col] == 'b' &&
+                    (field.fld[row - 1][col + 1] == '*' || field.fld[row - 1][col - 1] == '*')) {
+                    can_move = true;
+                }
+                if (field.fld[row][col] == 'B' || field.fld[row][col] == 'b') {
+                    int change_step[2] = {-1, 1};
+                    for (auto &i: change_step) {
+                        for (auto &j: change_step) {
+                            if (field.fld[row + i][col + j] == '*' && field.fld[row][col] == 'B') {
+                                can_move = true;
+                                break;
+                            }
+                            if ((field.fld[row + i][col + j] == 'w' || field.fld[row + i][col + j] == 'W') &&
+                                field.fld[row + i * 2][col + j * 2] == '*') {
+                                can_move = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (!can_move) {
+        return
+                WIN;
+    }
 
     if (steps_amount > 1000) {
-        return TIE;
+        return
+                TIE;
     }
 
     if (players[0]->checker_amount == 0 || players[1]->checker_amount == 0) {
-        return WIN;
+        return
+                WIN;
 
     }
-    return IN_PROGRESS;
+    return
+            IN_PROGRESS;
 }
 
 void game_t::play() {
-    std::set<std::pair<size_t, size_t>> attack_checkers;
+    std::set<std::pair<int, int>> attack_checkers;
     apply_step_t apply_result(false, 0);
     size_t counter = apply_result.player_num;
-    while (is_win() == IN_PROGRESS) {
+    while (is_win(counter) == IN_PROGRESS) {
         ++steps_amount;
         counter = apply_result.player_num;
         bool is_correct = false;
@@ -236,7 +315,7 @@ void game_t::play() {
         }
     }
 
-    if (is_win() == TIE) {
+    if (is_win(counter) == TIE) {
         for (const auto &p : players) {
             p->on_tie();
         }

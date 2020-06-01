@@ -21,8 +21,8 @@ private:
         IN_PROGRESS
     };
 
-    game_outcome_t is_win() const;
-    apply_step_t apply_step(const step_t &step, size_t player_num, std::set<std::pair<size_t, size_t> > &attack_checkers);
+    game_outcome_t is_win(size_t player_num) const;
+    apply_step_t apply_step(const step_t &step, size_t player_num, std::set<std::pair<int, int> > &attack_checkers);
 
     field_t field;
     std::vector<player_t> players;

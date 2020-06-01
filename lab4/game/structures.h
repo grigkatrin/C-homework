@@ -23,33 +23,19 @@ struct apply_step_t {
 
 struct field_t {
     field_t() {
-//        for (int i = 0; i < 8; i++) {
-//            for (int j = 0; j < 8; j++) {
-//                if ((i < 3) && ((i + j) % 2 == 1)) {
-//                    fld[i][j] = 'w';
-//                } else if ((i >= 5) && ((i + j) % 2 == 1)) {
-//                    fld[i][j] = 'b';
-//                } else if ((i + j) % 2 == 1) {
-//                    fld[i][j] = '*';
-//                } else {
-//                    fld[i][j] = '.';
-//                }
-//            }
-//        }
-
-        for (int row = 0; row < 8; ++row) {
-            for (int col = 0; col < 8; ++col) {
-                if ((row + col) % 2 == 0) {
-                    fld[row][col] = '.';
-                    continue;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if ((i < 3) && ((i + j) % 2 == 1)) {
+                    fld[i][j] = 'w';
+                } else if ((i >= 5) && ((i + j) % 2 == 1)) {
+                    fld[i][j] = 'b';
+                } else if ((i + j) % 2 == 1) {
+                    fld[i][j] = '*';
                 } else {
-                    fld[row][col] = '*';
+                    fld[i][j] = '.';
                 }
             }
         }
-        fld[6][3]='B';
-        fld[4][1]='w';
-        fld[2][1]='w';
     }
 
     char fld[8][8];

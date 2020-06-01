@@ -10,8 +10,7 @@ public:
 
     step_t next_step(const field_t &field, std::pair<size_t, size_t> current_checker) override;
 
-    bool possible_attack(const field_t &field, size_t player_num,
-                         std::set<std::pair<size_t, size_t>> &attack_checker) override;
+    bool possible_attack(const field_t &field, std::set<std::pair<int, int>> &attack_checker) override;
 
     void on_incorrect_step(const step_t &step) const override;
 
