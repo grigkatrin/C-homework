@@ -1,4 +1,4 @@
-#include "computer1.h"
+#include "computer2.h"
 
 #include <cassert>
 #include <iostream>
@@ -6,10 +6,10 @@
 #include <vector>
 
 
-computer_strategy_t_1::computer_strategy_t_1(std::string name) :
+computer_strategy_t_2::computer_strategy_t_2(std::string name) :
         name(std::move(name)) {}
 
-step_t computer_strategy_t_1::make_step(const field_t &fld) {
+step_t computer_strategy_t_2::make_step(const field_t &fld) {
     std::set<std::pair<int, int>> attack_checkers;
     std::set<std::pair<int, int>> move_checkers;
     std::pair<int, int> selected_checker;
@@ -41,7 +41,6 @@ step_t computer_strategy_t_1::make_step(const field_t &fld) {
 
         if (!attack_checkers.empty()) {
             std::vector<std::pair<int, int>> possible_checkers(attack_checkers.begin(), attack_checkers.end());
-            std::shuffle(possible_checkers.begin(), possible_checkers.end(), std::mt19937(std::random_device()()));
             selected_checker = possible_checkers.front();
 
             if (fld.fld[selected_checker.second][selected_checker.first] == 'W' ||
@@ -75,12 +74,10 @@ step_t computer_strategy_t_1::make_step(const field_t &fld) {
                 }
             }
 
-            std::shuffle(possible_moves.begin(), possible_moves.end(), std::mt19937(std::random_device()()));
             selected_target = possible_moves.front();
 
         } else if (!move_checkers.empty()) {
             std::vector<std::pair<int, int>> possible_checkers(move_checkers.begin(), move_checkers.end());
-            std::shuffle(possible_checkers.begin(), possible_checkers.end(), std::mt19937(std::random_device()()));
             selected_checker = possible_checkers.front();
 
             if (fld.fld[selected_checker.second][selected_checker.first] == 'w') {
@@ -108,7 +105,6 @@ step_t computer_strategy_t_1::make_step(const field_t &fld) {
                 }
             }
 
-            std::shuffle(possible_moves.begin(), possible_moves.end(), std::mt19937(std::random_device()()));
             selected_target = possible_moves.front();
         }
     } else {
@@ -138,7 +134,6 @@ step_t computer_strategy_t_1::make_step(const field_t &fld) {
 
         if (!attack_checkers.empty()) {
             std::vector<std::pair<int, int>> possible_checkers(attack_checkers.begin(), attack_checkers.end());
-            std::shuffle(possible_checkers.begin(), possible_checkers.end(), std::mt19937(std::random_device()()));
             selected_checker = possible_checkers.front();
 
             if (fld.fld[selected_checker.second][selected_checker.first] == 'B' ||
@@ -172,11 +167,9 @@ step_t computer_strategy_t_1::make_step(const field_t &fld) {
                 }
             }
 
-            std::shuffle(possible_moves.begin(), possible_moves.end(), std::mt19937(std::random_device()()));
             selected_target = possible_moves.front();
         } else if (!move_checkers.empty()) {
             std::vector<std::pair<int, int>> possible_checkers(move_checkers.begin(), move_checkers.end());
-            std::shuffle(possible_checkers.begin(), possible_checkers.end(), std::mt19937(std::random_device()()));
             selected_checker = possible_checkers.front();
 
             if (fld.fld[selected_checker.second][selected_checker.first] == 'b') {
@@ -204,7 +197,6 @@ step_t computer_strategy_t_1::make_step(const field_t &fld) {
                 }
             }
 
-            std::shuffle(possible_moves.begin(), possible_moves.end(), std::mt19937(std::random_device()()));
             selected_target = possible_moves.front();
         }
     }
@@ -213,7 +205,7 @@ step_t computer_strategy_t_1::make_step(const field_t &fld) {
             selected_target.second + 1};
 }
 
-bool computer_strategy_t_1::possible_attack(const field_t &fld, std::set<std::pair<int, int> > &attack_checker) {
+bool computer_strategy_t_2::possible_attack(const field_t &fld, std::set<std::pair<int, int> > &attack_checker) {
     attack_checker.clear();
     bool changed = false;
     for (int i = 0; i < 8; i++) {
@@ -236,7 +228,7 @@ bool computer_strategy_t_1::possible_attack(const field_t &fld, std::set<std::pa
     return changed;
 }
 
-step_t computer_strategy_t_1::next_step(const field_t &field, std::pair<size_t, size_t> current_checker) {
+step_t computer_strategy_t_2::next_step(const field_t &field, std::pair<size_t, size_t> current_checker) {
     std::pair<int, int> selected_checker;
     std::pair<int, int> selected_target;
     std::vector<std::pair<int, int>> possible_moves;
@@ -336,14 +328,13 @@ step_t computer_strategy_t_1::next_step(const field_t &field, std::pair<size_t, 
         }
     }
 
-    std::shuffle(possible_moves.begin(), possible_moves.end(), std::mt19937(std::random_device()()));
     selected_target = possible_moves.front();
 
     return {selected_checker.first + 1, selected_checker.second + 1, selected_target.first + 1,
             selected_target.second + 1};
 }
 
-void computer_strategy_t_1::print_stat() const {
+void computer_strategy_t_2::print_stat() const {
     std::cout << "Random model [" << name << "]: " << std::endl;
     computer_interface_t::print_stat();
 }

@@ -2,7 +2,8 @@
 
 #include "game/game.h"
 #include "strategies/human.h"
-#include "strategies/computer.h"
+#include "strategies/computer1.h"
+#include "strategies/computer2.h"
 
 
 int main() {
