@@ -274,18 +274,10 @@ step_t computer_strategy_t_1::next_step(const field_t &field, std::pair<size_t, 
                         }
                         if (field.fld[selected_checker.second + i * R][selected_checker.first + j * R] == 'b' ||
                             field.fld[selected_checker.second + i * R][selected_checker.first + j * R] == 'B') {
-//                        std::cout << "Enemy " << selected_checker.first + j * R + 1 << ' '
-//                                      << selected_checker.second + i * R + 1 << ' '
-//                                      << field.fld[selected_checker.second + i * R][selected_checker.first + j * R]
-//                                      << std::endl;
                             enemy = true;
                         }
                         if (enemy &&
                             field.fld[selected_checker.second + i * R][selected_checker.first + j * R] == '*') {
-//                        std::cout << "Cell " << selected_checker.first + j * R + 1 << ' '
-//                                      << selected_checker.second + i * R + 1 << ' '
-//                                      << field.fld[selected_checker.second + i * R][selected_checker.first + j * R]
-//                                      << std::endl;
                             possible_moves.emplace_back(selected_checker.first + j * R,
                                                         selected_checker.second + i * R);
                         }

@@ -21,7 +21,6 @@ void computer_interface_t::on_tie() {
 }
 
 void computer_interface_t::on_incorrect_step(const step_t &step) const {
-    std::cout << step.x_from << ' ' << step.y_from << ' ' << step.x_to << ' ' << step.y_to << ' ' << std::endl;
     assert(false);
 }
 

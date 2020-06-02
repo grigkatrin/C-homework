@@ -6,8 +6,10 @@ game_t::game_t(const player_t &first, const player_t &second) :
         field() {
     players.push_back(first);
     players[0]->player_num = 0;
+    players[0]->checker_amount = 12;
     players.push_back(second);
     players[1]->player_num = 1;
+    players[1]->checker_amount = 12;
 }
 
 apply_step_t
@@ -76,9 +78,10 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<int
                         std::pair<size_t, size_t> enemy_pos;
                         int k_y = (next_step.y_to - next_step.y_from) / abs(next_step.y_to - next_step.y_from);
                         int k_x = (next_step.x_to - next_step.x_from) / abs(next_step.x_to - next_step.x_from);
-                        for (int i = 1; i < abs(step.y_to - step.y_from); ++i) {
+                        for (int i = 1; i < abs(next_step.y_to - next_step.y_from); ++i) {
                             if (enemy &&
                                 field.fld[next_step.y_from + i * k_y - 1][next_step.x_from + i * k_x - 1] != '*') {
+                                std::cout << 123 << std::endl;
                                 enemy = false;
                                 break;
                             }
@@ -94,7 +97,7 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<int
                             std::swap(field.fld[next_step.y_from - 1][next_step.x_from - 1],
                                       field.fld[next_step.y_to - 1][next_step.x_to - 1]);
                             field.fld[enemy_pos.second][enemy_pos.first] = '*';
-                            if (next_step.y_to == 8) {
+                            if (next_step.y_to == 8 && field.fld[next_step.y_to - 1][next_step.x_to - 1] != 'W') {
                                 field.fld[next_step.y_to - 1][next_step.x_to - 1] = 'W';
                                 return {true, next_player};
                             }
@@ -176,7 +179,7 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<int
                         std::pair<size_t, size_t> enemy_pos;
                         int k_y = (next_step.y_to - next_step.y_from) / abs(next_step.y_to - next_step.y_from);
                         int k_x = (next_step.x_to - next_step.x_from) / abs(next_step.x_to - next_step.x_from);
-                        for (int i = 1; i < abs(step.y_to - step.y_from); ++i) {
+                        for (int i = 1; i < abs(next_step.y_to - next_step.y_from); ++i) {
                             if (enemy &&
                                 field.fld[next_step.y_from + i * k_y - 1][next_step.x_from + i * k_x - 1] != '*') {
                                 enemy = false;
@@ -193,7 +196,7 @@ game_t::apply_step(const step_t &step, size_t player_num, std::set<std::pair<int
                             --players[next_player]->checker_amount;
                             std::swap(field.fld[next_step.y_from - 1][next_step.x_from - 1],
                                       field.fld[next_step.y_to - 1][next_step.x_to - 1]);
-                            if (next_step.y_to == 1) {
+                            if (next_step.y_to == 1 && field.fld[next_step.y_to - 1][next_step.x_to - 1] != 'B') {
                                 field.fld[next_step.y_to - 1][next_step.x_to - 1] = 'B';
                                 return {true, next_player};
                             }

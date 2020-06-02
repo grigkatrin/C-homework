@@ -8,7 +8,7 @@
 
 int main() {
     auto player1 = std::make_shared<computer_strategy_t_1>("First player");
-    auto player2 = std::make_shared<computer_strategy_t_1>("Second player");
+    auto player2 = std::make_shared<computer_strategy_t_2>("Second player");
 
 //    auto player1 = std::make_shared<human_strategy_t>("First player");
 //    auto player2 = std::make_shared<human_strategy_t>("Second player");
